@@ -1,7 +1,6 @@
 const Util = {
     HOUR: 24,
     MINUTE_SECOND: 60,
-    audio: new Audio(),
     now: function(nowDate) {
         let hour = this.buling(nowDate.getHours());
         let minute = this.buling(nowDate.getMinutes());
@@ -61,6 +60,10 @@ const Util = {
         return parseInt(str || 0);
     }
 }
+
+//由于每次修改audio对象的src属性播放时都会重新加载音频文件
+//所以此处改为使用对象存储，1.不存在音频对象，创建并赋值src再播放，2.存在音频对象直接播放
+const audioObject = {};
 
 const storage = window.localStorage;
 
@@ -165,9 +168,14 @@ var vm = new Vue({
             if(this.testPlayDisabled == true) {
                 return;
             }
-            Util.audio.loop = false;
-            Util.audio.src = "./zhengdian/" + Util.buling(this.nowDate.getHours()) + ".ogg";
-            Util.audio.play();
+            let audio = audioObject[this.nowDate.getHours()];
+            if(!audio) {
+                audio = new Audio();
+                audio.loop = false;
+                audio.src = "./zhengdian/" + Util.buling(this.nowDate.getHours()) + ".ogg";
+                audioObject[this.nowDate.getHours()] = audio;
+            }
+            audio.play();
             this.shangciZhengdian = this.nowDate.getHours();
         },
         checkShengyu(){
@@ -220,15 +228,21 @@ var vm = new Vue({
             this.disabled = true;
             this.testPlayDisabled = true;
             this.stopPlayDisabled = false;
-            Util.audio.loop = true;
-            Util.audio.src = "./music/" + this.music + ".ogg";
-            Util.audio.play();
+            let audio = audioObject[this.music];
+            if(!audio) {
+                audio = new Audio();
+                audio.loop = true;
+                audio.src = "./music/" + this.music + ".ogg";
+                audioObject[this.music] = audio;
+            }
+            audio.play();
             if(this.ringTime) {
                 setTimeout(this.stopPlay, this.ringTime * 1000);
             }
         },
         stopPlay() {
-            Util.audio.pause();
+            //重新加载音频元素,由于没有设置自动播放，这里当停止用
+            audioObject[this.music].load();
             this.warn = false;
             this.warnBool = false;
             this.hour = "--";

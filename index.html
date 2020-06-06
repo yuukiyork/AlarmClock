@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>在线闹钟</title>
+		<link rel="shortcut icon" type="image/ico" href="favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+	</head>
+	<body>
+		<div id="app" style="display: none;" :style="{display: 'block'}">
+			<div class="container">
+				<div class="time-part">
+					<div class="option-item">
+						<input type="checkbox" v-model="zhengdianBaoshi" class="FL"/>
+						<span :class="{lineThrough: !zhengdianBaoshi}" class="FL">整点报时</span>
+					</div>
+					<div class="current-time">{{now}}</div>
+				</div>
+				<div class="setting-part">
+					<div class="setting-row">
+						<label for="">响铃时间：</label>
+						<select v-model="hour" :disabled="disabled" @change="timeSetting">
+							<option v-for="item in constData.hours" :key="item" :label="item" :value="item"></option>
+						</select>
+						<span>:</span>
+						<select v-model="minute" :disabled="disabled" @change="timeSetting">
+							<option v-for="item in constData.minutesOrSeconds" :key="item" :label="item" :value="item"></option>
+						</select>
+						<span>:</span>
+						<select v-model="second" :disabled="disabled" @change="timeSetting">
+							<option v-for="item in constData.minutesOrSeconds" :key="item" :label="item" :value="item"></option>
+						</select>
+						<input type="text" maxlength="20" title="可在这里添加或修改备注" value="注意！时间到了！" class="msg" :class="{red: warnBool}" /></input>
+					</div>
+					<div class="setting-row quick-btn">
+						<label>快速设置：</label>
+						<button type="button" :disabled="disabled" @click="quickSetting(60)">+1</button>
+						<button type="button" :disabled="disabled" @click="quickSetting(300)">+5</button>
+						<button type="button" :disabled="disabled" @click="quickSetting(1800)">+30</button>
+						<button type="button" :disabled="disabled" @click="quickSetting(-60)">-1</button>
+						<button type="button" :disabled="disabled" @click="quickSetting(-300)">-5</button>
+						<button type="button" :disabled="disabled" @click="quickSetting(-1800)">-30</button>
+						<span class="green" :style="{'display':showTimeRemaining?'inline-block':'none'}">{{timeRemaining}}</span>
+					</div>
+					<div class="setting-row">
+						<label for="">提示铃声：</label>
+						<select v-model="music" :disabled="disabled">
+							<option v-for="item in constData.musicArray" :key="item.value" :label="item.text" :value="item.value"></option>
+						</select>
+						<button type="button" :disabled="testPlayDisabled" @click="testPlay">试听</button>
+						<button type="button" :disabled="stopPlayDisabled" @click="stopPlay" :class="{red: !stopPlayDisabled}">停止</button>
+					</div>
+					<div class="setting-row">
+						<label for="">响铃时长：</label>
+						<select v-model="ringTime" :disabled="disabled">
+							<option v-for="item in constData.ringTimeArray" :key="item.value" :label="item.text" :value="item.value"></option>
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<script src="js/vue.js"></script>
+		<script src="js/index.js"></script>
+	</body>
+</html>
